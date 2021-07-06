@@ -17,5 +17,13 @@ namespace PartsPractice.Models.DataLayer
 
         public DbSet<Parts> PartsItems { get; set; }
 
+        // Seed DB
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // seed initial data
+          
+            modelBuilder.ApplyConfiguration(new SeedParts());
+        }
+
     }
 }
