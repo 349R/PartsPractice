@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PartsPractice.Models.DataLayer;
 
 namespace PartsPractice.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210706185052_SeedDataBase")]
+    partial class SeedDataBase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,9 +42,6 @@ namespace PartsPractice.Migrations
                     b.Property<int>("QtyOnHand")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("WholeSalePrice")
-                        .HasColumnType("decimal(18,4)");
-
                     b.HasKey("PartId");
 
                     b.ToTable("PartsItems");
@@ -55,8 +54,7 @@ namespace PartsPractice.Migrations
                             Description = "Ball pein Hammer",
                             Name = "Hammer",
                             Price = 44.44m,
-                            QtyOnHand = 100,
-                            WholeSalePrice = 0m
+                            QtyOnHand = 100
                         },
                         new
                         {
@@ -65,8 +63,7 @@ namespace PartsPractice.Migrations
                             Description = "Flat head",
                             Name = "ScrewDriver",
                             Price = 10.44m,
-                            QtyOnHand = 50,
-                            WholeSalePrice = 0m
+                            QtyOnHand = 50
                         });
                 });
 #pragma warning restore 612, 618

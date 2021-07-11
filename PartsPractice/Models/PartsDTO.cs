@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+
 namespace PartsPractice.Models
 {
-    public class Parts
-    {   [Key]
+    public class PartsDTO
+    {
+
+        [Key]
         public long PartId { get; set; }                    // Unique Key
 
         public string Name { get; set; }
@@ -22,7 +25,5 @@ namespace PartsPractice.Models
 
         public bool Available { get; set; }
 
-        [Column(TypeName = "decimal(18,4)")]
-        public decimal WholeSalePrice { get; set; }
     }
 }

@@ -21,44 +21,61 @@ namespace PartsPractice.Controllers
             _context = context;
         }
 
-        // GET: api/Parts
+        // GET: api/Parts       
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Parts>>> GetPartsItems()
+        public async Task<ActionResult<IEnumerable<PartsDTO>>> GetPartsItems()
         {
-            return await _context.PartsItems.ToListAsync();
+            // return await _context.PartsItems.ToListAsync();
+            return await _context.PartsItems
+                .Select(x => PartsToDTO(x))                //Get parts to DTO 
+                .ToListAsync();
         }
 
         // GET: api/Parts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Parts>> GetParts(long id)
+        public async Task<ActionResult<PartsDTO>> GetPart(long id)
         {
-            var parts = await _context.PartsItems.FindAsync(id);
+            var part = await _context.PartsItems.FindAsync(id);     // Get part from DB
 
-            if (parts == null)
+            if (part == null)
             {
                 return NotFound();
             }
 
-            return parts;
+            return PartsToDTO(part);                    // copy parts to partDTO and return
         }
 
         // PUT: api/Parts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutParts(long id, Parts parts)
+        public async Task<IActionResult> PutParts(long id, PartsDTO partDTO)     
         {
-            if (id != parts.PartId)
+            if (id != partDTO.PartId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(parts).State = EntityState.Modified;
+            var part = await _context.PartsItems.FindAsync(id);
+            if (part == null)
+            {
+                return NotFound();
+            }
+
+            part.Available = partDTO.Available;
+            part.Description = partDTO.Description;
+            part.Name = partDTO.Name;
+            part.Price = partDTO.Price;
+            part.QtyOnHand = partDTO.QtyOnHand;
+            part.PartId = partDTO.PartId;
+
+
+            _context.Entry(partDTO).State = EntityState.Modified;       // Change state to modified
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();                      // Save the changes
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException) when (!PartsExists(id))
             {
                 if (!PartsExists(id))
                 {
@@ -76,26 +93,46 @@ namespace PartsPractice.Controllers
         // POST: api/Parts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Parts>> PostParts(Parts parts)
-        {
-            _context.PartsItems.Add(parts);
+        public async Task<ActionResult<PartsDTO>> PostParts(PartsDTO partDTO)
+        {            
+            var part = new Parts
+            {
+                Available = partDTO.Available,
+                Description = partDTO.Description,
+                Name = partDTO.Name,
+                Price = partDTO.Price,
+                QtyOnHand = partDTO.QtyOnHand,
+                PartId = partDTO.PartId               
+            };
+                        
+            _context.PartsItems.Add(part);
             await _context.SaveChangesAsync();
 
             //return CreatedAtAction("GetParts", new { id = parts.PartId }, parts);
-            return CreatedAtAction(nameof(GetParts), new { id = parts.PartId }, parts);
+            
+            
+            
+            return CreatedAtAction(nameof(GetPart), new { id = part.PartId }, PartsToDTO(part));
+
+            // use nameof instead of hardcode to protect against refactor error
+            // CreatedAtAction produces a Status201Created response 
+            // returns newly created resource/parts
+            // add a location header to the response. the location header specifies the
+            // URI of the newly created parts object
+            // The url should be the url at which a GET request would return the object url. 
         }
 
         // DELETE: api/Parts/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteParts(long id)
         {
-            var parts = await _context.PartsItems.FindAsync(id);
-            if (parts == null)
+            var part = await _context.PartsItems.FindAsync(id);
+            if (part == null)
             {
                 return NotFound();
             }
 
-            _context.PartsItems.Remove(parts);
+            _context.PartsItems.Remove(part);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -105,5 +142,20 @@ namespace PartsPractice.Controllers
         {
             return _context.PartsItems.Any(e => e.PartId == id);
         }
+
+        // copy parts to parts DTO. Pass Parts Object into method
+        private static PartsDTO PartsToDTO(Parts parts) =>
+            new PartsDTO
+            {
+                PartId      =   parts.PartId,
+                Name        =   parts.Name,
+                Description =   parts.Description,
+                Price       =   parts.Price,
+                QtyOnHand   =   parts.QtyOnHand,
+                Available   =   parts.Available
+
+
+            };
+
     }
 }
