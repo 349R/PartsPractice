@@ -30,7 +30,8 @@ namespace PartsPractice
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            //services.AddControllers();                        old
+            services.AddControllersWithViews();               // needed for MVC
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PartsPractice", Version = "v1" });
